@@ -44,6 +44,10 @@ int send_EOL = 1;
 
 "let"                         { return CMD_VAR; }
 
+"\""                          { return ASPA; }
+
+","                          { return COMMA; }
+
 "="                           { return OP_ATRIB; }
 
 "+"                           { return OP_SUM; }
@@ -79,6 +83,8 @@ int send_EOL = 1;
 [0-9]+(\.[0-9]*)?             { yylval.tyInt = atof(yytext); return TYPE_INT; }
 
 [a-zA-Z]+([a-zA-Z]|[0-9])*    { yylval.tyString = strdup(yytext); return VAR; }
+
+\".*\"                        { yylval.tyString = strdup(yytext); return VARP; }
 
 "{"                           { return SYM_OB; }
 

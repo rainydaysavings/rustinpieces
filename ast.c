@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "parser.tab.h"
 #include "ast.h"
-
 // Go from a statement to the next
 StmtList* ast_stmtList(Stmt* stmt, StmtList* next)
 {
@@ -14,7 +13,7 @@ StmtList* ast_stmtList(Stmt* stmt, StmtList* next)
   return s;
 }
 
-// Statements 
+// Statements
 Stmt* ast_stmt_attrib(Attrib* attrib)
 {
   Stmt* s = (Stmt*)malloc(sizeof(Stmt));
@@ -46,7 +45,13 @@ Stmt* ast_stmt_print(Print* print)
   s->core.print = print;
   return s;
 }
-
+Stmt* ast_stmt_read(Read* read)
+{
+  Stmt* s = (Stmt*)malloc(sizeof(Stmt));
+  s->kind = STMT_READ;
+  s->core.read = read;
+  return s;
+}
 Stmt* ast_stmt_while(While* whileCmd)
 {
   Stmt* s = (Stmt*)malloc(sizeof(Stmt));
@@ -70,6 +75,7 @@ Attrib* ast_attrib_assign(var id, Expr* expr)
   a->kind = ATTRIB_ASSIGN;
   a->id = id;
   a->expr = expr;
+
   return a;
 }
 
@@ -142,19 +148,20 @@ Expr* ast_expr_op_bool(Expr* l_expr, token op, Expr* r_expr)
 }
 
 // IO
-Print* ast_print_input(var id)
+Print* ast_print_input_word(var id)
 {
   Print* f = (Print*)malloc(sizeof(Print));
   f->kind = PRINT_INPUT;
+  f->type = WORD;
   f->id = id;
   return f;
 }
-
-Print* ast_print_output(var id)
+Read* ast_print_output(var str, var input)
 {
-  Print* f = (Print*)malloc(sizeof(Print));
-  f->kind = PRINT_OUTPUT;
-  f->id = id;
+  Read* f = (Read*)malloc(sizeof(Read));
+  f->kind = print_Output;
+  f->in = input;
+  f->str = str;
   return f;
 }
 
@@ -225,6 +232,10 @@ void printStmt(Stmt* stmt, int depth)
     printIf(stmt->core._if, depth);         break;
   case STMT_WHILE:
     printWhile(stmt->core._while, depth);       break;
+  case STMT_PRINT:
+    printOutput(stmt->core.print, depth);       break;
+  case STMT_READ:
+    printRead(stmt->core.read, depth);       break;
   default:
     printPrint(stmt->core.print, depth);
   }
@@ -232,11 +243,32 @@ void printStmt(Stmt* stmt, int depth)
   putchar('\n');
 }
 
-void printAttrib(Attrib* attrib, int depth)
-{
+void printRead(Read* attrib, int depth){
   if(!attrib)
     return;
+  printTab((depth+1)*BRANCH_SIZE);
+  printf("read_line\n");
 
+  printTab((depth+2)*BRANCH_SIZE);
+  printf("%s\n", attrib->str);
+  printTab((depth+3)*BRANCH_SIZE);
+  printf("%s\n", attrib->in);
+}
+
+void printOutput(Print* attrib, int depth){
+  if(!attrib)
+    return;
+  printTab((depth+1)*BRANCH_SIZE);
+  printf("println!\n");
+
+  printTab((depth+2)*BRANCH_SIZE);
+  printf("%s\n", attrib->id);
+}
+void printAttrib(Attrib* attrib, int depth)
+{
+
+  if(!attrib)
+    return;
   printTab((depth+1)*BRANCH_SIZE);
   printf("%s\n", attrib->id);
 

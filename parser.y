@@ -35,9 +35,12 @@ CMD_IF
 CMD_ELSE
 CMD_WHILE
 VAR
+VARP
 TYPE_INT
 TYPE_BOOL
 EOL
+ASPA
+COMMA
 SYM_OB
 SYM_CB
 SYM_OP
@@ -59,17 +62,18 @@ SYM_SC
 {
   char* tyString;
   int tyInt;
-
   StmtList* tyStmtList;
   Stmt* tyStmt;
   Attrib* tyAttrib;
   Expr* tyExpr;
   Print* tyPrint;
+  Read* tyRead;
   While* tyWhile;
   If* tyIf;
 }
 
 %type <tyString> VAR
+%type <tyString> VARP
 %type <tyInt> TYPE_BOOL
 %type <tyInt> TYPE_INT
 %type <tyStmtList> Program
@@ -81,12 +85,11 @@ SYM_SC
 %type <tyExpr> Factor
 %type <tyAttrib> Assignment
 %type <tyAttrib> Declaration
-%type <tyAttrib> VarDecl
 %type <tyAttrib> AttribStmt
 %type <tyWhile> WhileStmt
 %type <tyIf> IfStmt
 %type <tyPrint> InputStmt
-%type <tyPrint> OutputStmt
+%type <tyRead> OutputStmt
 %type <tyStmt> Statement
 
 %%
@@ -126,26 +129,20 @@ AttribStmt   { $$ = ast_stmt_attrib($1);  }
 | IfStmt     { $$ = ast_stmt_if($1);      }
 | WhileStmt  { $$ = ast_stmt_while($1);   }
 | InputStmt  { $$ = ast_stmt_print($1);   }
-| OutputStmt { $$ = ast_stmt_print($1);   }
+| OutputStmt { $$ = ast_stmt_read($1);   }
 ;
 
 InputStmt:
-CMD_SCAN SYM_OP VAR SYM_CP SYM_SC
+CMD_PRINT SYM_OP VARP SYM_CP
 {
-  if(list_get(symList,$3) == -1)
-    yyerror("variable not declared!");
-
-  $$ = ast_print_input($3);
+  $$ = ast_print_input_word($3);
 }
 ;
 
 OutputStmt:
-CMD_PRINT SYM_OP VAR SYM_CP SYM_SC
+CMD_SCAN SYM_OP VAR COMMA VAR SYM_CP
 {
-  if(list_get(symList,$3) == -1)
-    yyerror("variable not declared!");
-
-  $$ = ast_print_output($3);
+  $$ = ast_print_output($3,$5);
 }
 ;
 
@@ -194,8 +191,8 @@ CMD_WHILE Block               { $$ = ast_while(NULL,$2); }
 
 AttribStmt:
                  { $$ = NULL; }
-| Assignment     { $$ = $1; }
 | Declaration    { $$ = $1; }
+| Assignment     { $$ = $1; }
 ;
 
 Assignment:
@@ -207,10 +204,7 @@ VAR OP_ATRIB Expression
 ;
 
 Declaration:
-VarDecl        { $$ = $1; }
-
-VarDecl:
-CMD_VAR VAR OP_ATRIB Expression SYM_SC
+CMD_VAR VAR OP_ATRIB Expression
 {
   if(list_get(symList,$2) != -1)
     yyerror("Already defined.");

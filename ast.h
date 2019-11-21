@@ -24,7 +24,8 @@ struct _Stmt
     STMT_BLOCK,
     STMT_IF,
     STMT_WHILE,
-    STMT_PRINT
+    STMT_PRINT,
+    STMT_READ
   } kind;
 
   union
@@ -35,7 +36,18 @@ struct _Stmt
     struct _If* _if;
     struct _While* _while;
     struct _Print* print;
+    struct _Read* read;
   } core;
+};
+
+struct _Read
+{
+  enum
+  {
+    print_Output
+  } kind;
+  var in;
+  var str;
 };
 
 struct _Attrib
@@ -84,10 +96,12 @@ struct _Print
 {
   enum
   {
-    PRINT_INPUT,
-    PRINT_OUTPUT
+    PRINT_INPUT
   } kind;
-
+  enum
+  {
+    WORD
+  } type;
   var id;
 };
 
@@ -111,6 +125,7 @@ typedef struct _Stmt Stmt;
 typedef struct _Attrib Attrib;
 typedef struct _Expr Expr;
 typedef struct _Print Print;
+typedef struct _Read Read;
 typedef struct _While While;
 typedef struct _If If;
 
@@ -121,6 +136,7 @@ Stmt* ast_stmt_attrib(Attrib* attrib);
 Stmt* ast_stmt_expr(Expr* expr);
 Stmt* ast_stmt_block(StmtList* block);
 Stmt* ast_stmt_print(Print* print);
+Stmt* ast_stmt_read(Read* read);
 Stmt* ast_stmt_while(While* whileCmd);
 Stmt* ast_stmt_if(If* ifCmd);
 Attrib* ast_attrib_decl(var id, Expr* expr);
@@ -131,8 +147,8 @@ Expr* ast_expr_identifier_int(var id);
 Expr* ast_expr_identifier_bool(var id);
 Expr* ast_expr_op_int(Expr* l_expr, token op, Expr* r_expr);
 Expr* ast_expr_op_bool(Expr* l_expr, token op, Expr* r_expr);
-Print* ast_print_input(var id);
-Print* ast_print_output(var id);
+Print* ast_print_input_word(var id);
+Read* ast_print_output(var str, var input);
 While* ast_while(Expr* cond, StmtList* block);
 If* ast_if(Attrib* attrib, Expr* cond, StmtList* block, StmtList* elseBlock);
 
@@ -145,6 +161,8 @@ void printExpr(Expr* expr, int depth);
 void printIf(If* _if, int depth);
 void printWhile(While* _while, int depth);
 void printPrint(Print* print, int depth);
+void printOutput(Print* attrib, int depth);
+void printRead(Read* attrib, int depth);
 void printOp(Binop op, int depth);
 void printTab(int size);
 
