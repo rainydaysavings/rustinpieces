@@ -1,6 +1,6 @@
 # rustinpieces
 a small Rust proto compiler
 
-## Usage
-./rust_in_pieces programhere.rs
+## usage
+./rust_in_pieces program_here.rs
 
