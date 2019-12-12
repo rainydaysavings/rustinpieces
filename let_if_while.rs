@@ -4,8 +4,8 @@ fn main(){
     if x < 4{
         let y = 42
     }
-
+    
     while x < 3{
-        x = x + 1;
+	x = x + 1;
     }
 }

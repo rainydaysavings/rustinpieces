@@ -17,13 +17,17 @@
 
 #include "ast.h"
 #include "symlist.h"
+#include "code.h"
+#include "mips.h"
 
 StmtList* root;
+InstrList* ic3;
 List* symList;
 
 int validate_expression(Expr* expr, int type);
 int validate_operation(Expr* lhs, Expr* rhs, int type);
 int validate_var(string var, int type);
+void generateASM();
 void menu();
 
 }
@@ -99,6 +103,7 @@ Program:
 | Main
 {
   root = $1;
+  ic3 = genIC(root);
   menu();
 }
 ;
@@ -356,7 +361,24 @@ int validate_var(string var, int type)
 
 void menu()
 {
-  printAST(root,0);
+  int quit = 0;
+  int op;
+  
+  do {
+    putchar('\n');
+    printf("What do you want to do?\n1-Print AST\n2-Print IC\n3-Print MIPS\n4-Exit\n> ");
+    scanf("%d", &op);
+    putchar('\n');
+
+    switch(op)
+    {
+    case 1: printAST(root,0);       break;
+    case 2: printIC(ic3);           break;
+    case 3: printMIPS(ic3);         break;
+    case 4: quit = 1;               break;
+    }
+    
+  } while(!quit);
 }
 
 void yyerror(const char *s)
