@@ -77,7 +77,7 @@ void write_text(InstrList* ic3)
     case iGOTO:
       write_goto(p->instr);             break;
     default:
-      printf("How do I MIPS this?!\n");
+      printf("Error.\n");
     }
 
     p = p->next;
@@ -199,4 +199,4 @@ void write_op(Instr* instr, int iff, char* op)
 
   if(iff && next_temp)
     next_temp--;
-} 
+}

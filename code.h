@@ -3,17 +3,25 @@
 
 #include "ast.h"
 
+
+
 typedef char* var;
 typedef char* label;
 typedef char* regist;
 
+
+
 typedef enum { iCOPY, iADD, iSUB, iMULT, iDIV, iMOD, iAND, iOR, iGOTO, iLT, iLTE, iGT, iGTE, iEQ, iDIFF, iIF_F, iLABEL, iRD, iWR } instr_kind;
+
+
 
 struct _InstrList
 {
   struct _Instr *instr;
   struct _InstrList *next;
 };
+
+
 
 struct _Instr
 {
@@ -22,6 +30,8 @@ struct _Instr
   struct _Address* addr2;
   struct _Address* addr3;
 };
+
+
 
 struct _Address
 {
@@ -38,11 +48,15 @@ struct _Address
   } core;
 };
 
+
+
 struct _Pair
 {
   struct _Address* first;
   struct _InstrList* second;
 };
+
+
 
 struct _RegList
 {
@@ -52,6 +66,8 @@ struct _RegList
   struct _RegList* next;
 };
 
+
+
 typedef struct _Address Address;
 typedef struct _Instr Instr;
 typedef struct _InstrList InstrList;
@@ -59,15 +75,11 @@ typedef struct _Pair Pair;
 typedef struct _RegList RegList;
 
 
+
 extern RegList* reg_list;
 extern int reg_count, label_count;
 
 
-/*
- *
- * IC
- *
- */
 
 InstrList* genIC(StmtList* ast);
 InstrList* compile_attrib(Attrib* attrib);
@@ -86,11 +98,7 @@ void print_address(Address* addr, int eol);
 InstrList* list_concat(InstrList* lhs, InstrList* rhs);
 InstrList* list_append(InstrList* list, Instr* instr);
 
-/*
- *
- * LABEL + REGIST LIST
- *
- */
+
 
 label new_label();
 regist reg_get(var id);

@@ -5,8 +5,10 @@
 #include "parser.tab.h"
 
 
+
 RegList* reg_list;
 int reg_count=0, label_count=0;
+
 
 
 InstrList* genIC(StmtList* ast)
@@ -39,19 +41,8 @@ InstrList* genIC(StmtList* ast)
   return ic;
 }
 
-/*
- * var id;
- *
- * (VAL, NULL)       -> id->NEW_REG(R), return COPY R VAL
- *                   -> return COPY LOAD_REG(id) VAL
- *
- * (REG, NULL)       -> id->NEW_REG(R), return COPY R REG
- *                   -> return COPY LOAD_REG(id) REG
- *
- * (REG, [commands]) -> id->REG, return commands
- *                   -> free(REG), commands.last.changeAttr1 = LOAD_REG(id), return commands
- *
- */
+
+
 InstrList* compile_attrib(Attrib* attrib)
 {
   Pair* p = compile_expr(attrib->expr);
@@ -71,12 +62,11 @@ InstrList* compile_attrib(Attrib* attrib)
   }
   else
   {
-    // normal attribution
     if(!r)
       reg_assoc(p->first->core.reg, attrib->id);
     else
     {
-      reg_free(); // p->first was an unecessary alloc()
+      reg_free();
 
       InstrList* n = p->second;
       while(n->next)
@@ -84,16 +74,11 @@ InstrList* compile_attrib(Attrib* attrib)
       n->instr->addr1->core.reg = r;
     }
   }
-
   return p->second;
 }
 
 
-/*
- * ret (VAL, NULL)
- * ret (REG, NULL)
- * ret (REG, [COMMANDS])
- */
+
 Pair* compile_expr(Expr* expr)
 {
   if(expr->kind == EXPR_PRIMITIVE)
@@ -115,15 +100,15 @@ Pair* compile_expr(Expr* expr)
   return mk_pair(addr,list);
 }
 
+
+
 InstrList* compile_if(If* _if, int make_exit, Address* exit_addr)
 {
   InstrList* list = NULL;
 
-  // if attrib (can be NULL)
   if(_if->attrib)
     list = compile_attrib(_if->attrib);
 
-  // if condition
   Pair* p = compile_expr(_if->cond);
   if(!p->second)
   {
@@ -134,15 +119,12 @@ InstrList* compile_if(If* _if, int make_exit, Address* exit_addr)
 
   list = list_concat(list,p->second);
 
-  // if condition -> if_false
   Address* if_label = mk_address_regist(new_label());
   list = list_append(list, mk_instr(iIF_F, p->first, if_label, NULL));
-  reg_free(); // free temporary allocation for if_condition
+  reg_free();
 
-  // if block
   list = list_concat(list, genIC(_if->block));
 
-  // if block -> GOTO
   if(exit_addr)
     list = list_append(list, mk_instr(iGOTO, exit_addr, NULL, NULL));
   else if(make_exit && _if->elseBlock)
@@ -151,12 +133,9 @@ InstrList* compile_if(If* _if, int make_exit, Address* exit_addr)
     list = list_append(list, mk_instr(iGOTO, exit_addr, NULL, NULL));
   }
 
-  // if block -> LABEL
   list = list_append(list, mk_instr(iLABEL, if_label, NULL, NULL));
 
-  // if else
   if(_if->elseBlock && !(_if->elseBlock->stmt->kind == STMT_ATTRIB && !_if->elseBlock->stmt->core.attrib))
-                       // ^ temporary solution for empty ;;;; lines
   {
     if(_if->elseBlock->stmt->kind == STMT_IF)
       list = list_concat(list, compile_if(_if->elseBlock->stmt->core._if, 0, exit_addr));
@@ -170,15 +149,15 @@ InstrList* compile_if(If* _if, int make_exit, Address* exit_addr)
   return list;
 }
 
+
+
 InstrList* compile_while(While* _while)
 {
   InstrList* list = NULL;
 
-  // for -> LABEL
   Address* while_label = mk_address_regist(new_label());
   list = list_append(list, mk_instr(iLABEL, while_label, NULL, NULL));
 
-  // while cond
   Address* exit_addr = NULL;
   if(_while->cond)
   {
@@ -194,23 +173,21 @@ InstrList* compile_while(While* _while)
 
     exit_addr = mk_address_regist(new_label());
     list = list_append(list, mk_instr(iIF_F, p->first, exit_addr, NULL));
-    reg_free(); // free temporary allocation for for_condition
+    reg_free();
   }
 
-  // while block
   if(_while->block && !(_while->block->stmt->kind == STMT_ATTRIB && !_while->block->stmt->core.attrib))
-                    // ^ temporary solution for empty ;;;; lines
     list = list_concat(list, genIC(_while->block));
 
-  // for -> GOTO
   list = list_append(list, mk_instr(iGOTO,while_label,NULL,NULL));
 
-  // for -> exit LABEL
   if(exit_addr)
     list = list_append(list, mk_instr(iLABEL, exit_addr, NULL, NULL));
 
   return list;
 }
+
+
 
 Pair* mk_pair(Address* first, InstrList* second)
 {
@@ -220,6 +197,8 @@ Pair* mk_pair(Address* first, InstrList* second)
   return p;
 }
 
+
+
 Address* mk_address_const(int val)
 {
   Address* a = (Address*)malloc(sizeof(Address));
@@ -228,6 +207,8 @@ Address* mk_address_const(int val)
   return a;
 }
 
+
+
 Address* mk_address_regist(regist reg)
 {
   Address* a = (Address*)malloc(sizeof(Address));
@@ -235,6 +216,8 @@ Address* mk_address_regist(regist reg)
   a->core.reg = reg;
   return a;
 }
+
+
 
 Instr* mk_instr(instr_kind kind, Address* addr1, Address* addr2, Address* addr3)
 {
@@ -245,6 +228,8 @@ Instr* mk_instr(instr_kind kind, Address* addr1, Address* addr2, Address* addr3)
   i->addr3 = addr3;
   return i;
 }
+
+
 
 instr_kind get_binop_instr(Binop op)
 {
@@ -279,6 +264,8 @@ instr_kind get_binop_instr(Binop op)
   }
 }
 
+
+
 InstrList* mk_instrList(Instr* instr, InstrList* next)
 {
   InstrList* l = (InstrList*)malloc(sizeof(InstrList));
@@ -286,6 +273,8 @@ InstrList* mk_instrList(Instr* instr, InstrList* next)
   l->next = next;
   return l;
 }
+
+
 
 InstrList* list_concat(InstrList* lhs, InstrList* rhs)
 {
@@ -305,6 +294,8 @@ InstrList* list_concat(InstrList* lhs, InstrList* rhs)
   return lhs;
 }
 
+
+
 InstrList* list_append(InstrList* list, Instr* instr)
 {
   if(!list)
@@ -317,6 +308,8 @@ InstrList* list_append(InstrList* list, Instr* instr)
   p->next = mk_instrList(instr,NULL);
   return list;
 }
+
+
 
 void printIC(InstrList* ic)
 {
@@ -370,10 +363,11 @@ void printIC(InstrList* ic)
     default:
       printf("Other stuff I cant deal with right now...\n");
     }
-
     ic = ic->next;
   }
 }
+
+
 
 void print_operation(Instr* instr, char* op)
 {
@@ -382,6 +376,8 @@ void print_operation(Instr* instr, char* op)
   printf(" %s ", op);
   print_address(instr->addr3,1);
 }
+
+
 
 void print_address(Address* addr, int eol)
 {
@@ -393,12 +389,16 @@ void print_address(Address* addr, int eol)
   if(eol) putchar('\n');
 }
 
+
+
 label new_label()
 {
   label l = (label)malloc(10*sizeof(char));
   sprintf(l, "L%d", label_count++);
   return l;
 }
+
+
 
 regist reg_get(var id)
 {
@@ -414,10 +414,14 @@ regist reg_get(var id)
   return NULL;
 }
 
+
+
 void reg_free()
 {
   reg_count--;
 }
+
+
 
 regist reg_alloc()
 {
@@ -425,6 +429,8 @@ regist reg_alloc()
   sprintf(r, "R%d", reg_count++);
   return r;
 }
+
+
 
 RegList* mk_regList(regist reg, var id, RegList* next)
 {
@@ -435,6 +441,8 @@ RegList* mk_regList(regist reg, var id, RegList* next)
   r->next = next;
   return r;
 }
+
+
 
 void reg_assoc(regist reg, var id)
 {
