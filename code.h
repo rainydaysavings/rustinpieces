@@ -11,7 +11,7 @@ typedef char* regist;
 
 
 
-typedef enum { iCOPY, iADD, iSUB, iMULT, iDIV, iMOD, iAND, iOR, iGOTO, iLT, iLTE, iGT, iGTE, iEQ, iDIFF, iIF_F, iLABEL, iRD, iWR } instr_kind;
+typedef enum { nuCOPY, nuADD, nuSUB, nuMULT, nuDIV, nuMOD, nuAND, nuOR, nuGOTO, nuLT, nuLTE, nuGT, nuGTE, nuEQ, nuDIFF, nuIF_F, nuLABEL, nuREAD, nuWRITE } instr_kind;
 
 
 

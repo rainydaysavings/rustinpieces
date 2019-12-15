@@ -34,47 +34,47 @@ void write_text(InstrList* instructions)
   InstrList* p = instructions;
   while(p)
   {
-    int iff = p->next && p->next->instr->kind == iIF_F;
+    int iff = p->next && p->next->instr->kind == nuIF_F;
 
     switch(p->instr->kind)
     {
-    case iADD:
+    case nuADD:
       write_op(p->instr, iff, "add");   break;
-    case iSUB:
+    case nuSUB:
       write_op(p->instr, iff, "sub");   break;
-    case iMULT:
+    case nuMULT:
       write_op(p->instr, iff, "mul");   break;
-    case iDIV:
+    case nuDIV:
       write_op(p->instr, iff, "div");   break;
-    case iMOD:
+    case nuMOD:
       write_op(p->instr, iff, "mod");   break;
-    case iAND:
+    case nuAND:
       write_op(p->instr, iff, "and");   break;
-    case iOR:
+    case nuOR:
       write_op(p->instr, iff, "or");    break;
-    case iLT:
+    case nuLT:
       write_op(p->instr, iff, "slt");   break;
-    case iLTE:
+    case nuLTE:
       write_op(p->instr, iff, "sle");   break;
-    case iGT:
+    case nuGT:
       write_op(p->instr, iff, "sgt");   break;
-    case iGTE:
+    case nuGTE:
       write_op(p->instr, iff, "sge");   break;
-    case iEQ:
+    case nuEQ:
       write_op(p->instr, iff, "seq");   break;
-    case iDIFF:
+    case nuDIFF:
       write_op(p->instr, iff, "sne");   break;
-    case iRD:
+    case nuREAD:
       write_read(p->instr);             break;
-    case iWR:
+    case nuWRITE:
       write_write(p->instr);            break;
-    case iCOPY:
+    case nuCOPY:
       write_copy(p->instr, iff);        break;
-    case iIF_F:
+    case nuIF_F:
       write_iff(p->instr);              break;
-    case iLABEL:
+    case nuLABEL:
       write_label(p->instr);            break;
-    case iGOTO:
+    case nuGOTO:
       write_goto(p->instr);             break;
     default:
       printf("Error.\n");

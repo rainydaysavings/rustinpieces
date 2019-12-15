@@ -57,7 +57,7 @@ InstrList* compile_attrib(Attrib* attrib)
     }
 
     Address* addr = mk_address_regist(r);
-    p->second = mk_instrList( mk_instr(iCOPY,addr,p->first,NULL), NULL );
+    p->second = mk_instrList( mk_instr(nuCOPY,addr,p->first,NULL), NULL );
   }
   else
   {
@@ -112,27 +112,27 @@ InstrList* compile_if(If* _if, int make_exit, Address* exit_addr)
   if(!p->second)
   {
     Address* addr = mk_address_regist(reg_alloc());
-    p->second = mk_instrList(mk_instr(iCOPY,addr,p->first,NULL), NULL);
+    p->second = mk_instrList(mk_instr(nuCOPY,addr,p->first,NULL), NULL);
     p->first = addr;
   }
 
   list = list_concat(list,p->second);
 
   Address* if_label = mk_address_regist(new_label());
-  list = list_append(list, mk_instr(iIF_F, p->first, if_label, NULL));
+  list = list_append(list, mk_instr(nuIF_F, p->first, if_label, NULL));
   reg_free();
 
   list = list_concat(list, genIC(_if->block));
 
   if(exit_addr)
-    list = list_append(list, mk_instr(iGOTO, exit_addr, NULL, NULL));
+    list = list_append(list, mk_instr(nuGOTO, exit_addr, NULL, NULL));
   else if(make_exit && _if->elseBlock)
   {
     exit_addr = mk_address_regist(new_label());
-    list = list_append(list, mk_instr(iGOTO, exit_addr, NULL, NULL));
+    list = list_append(list, mk_instr(nuGOTO, exit_addr, NULL, NULL));
   }
 
-  list = list_append(list, mk_instr(iLABEL, if_label, NULL, NULL));
+  list = list_append(list, mk_instr(nuLABEL, if_label, NULL, NULL));
 
   if(_if->elseBlock && !(_if->elseBlock->stmt->kind == STMT_ATTRIB && !_if->elseBlock->stmt->core.attrib))
   {
@@ -143,7 +143,7 @@ InstrList* compile_if(If* _if, int make_exit, Address* exit_addr)
   }
 
   if(make_exit && exit_addr)
-    list = list_append(list, mk_instr(iLABEL, exit_addr, NULL, NULL));
+    list = list_append(list, mk_instr(nuLABEL, exit_addr, NULL, NULL));
 
   return list;
 }
@@ -155,7 +155,7 @@ InstrList* compile_while(While* _while)
   InstrList* list = NULL;
 
   Address* while_label = mk_address_regist(new_label());
-  list = list_append(list, mk_instr(iLABEL, while_label, NULL, NULL));
+  list = list_append(list, mk_instr(nuLABEL, while_label, NULL, NULL));
 
   Address* exit_addr = NULL;
   if(_while->cond)
@@ -164,24 +164,24 @@ InstrList* compile_while(While* _while)
     if(!p->second)
     {
       Address* addr = mk_address_regist(reg_alloc());
-      p->second = mk_instrList(mk_instr(iCOPY, addr, p->first, NULL), NULL);
+      p->second = mk_instrList(mk_instr(nuCOPY, addr, p->first, NULL), NULL);
       p->first = addr;
     }
 
     list = list_concat(list,p->second);
 
     exit_addr = mk_address_regist(new_label());
-    list = list_append(list, mk_instr(iIF_F, p->first, exit_addr, NULL));
+    list = list_append(list, mk_instr(nuIF_F, p->first, exit_addr, NULL));
     reg_free();
   }
 
   if(_while->block && !(_while->block->stmt->kind == STMT_ATTRIB && !_while->block->stmt->core.attrib))
     list = list_concat(list, genIC(_while->block));
 
-  list = list_append(list, mk_instr(iGOTO,while_label,NULL,NULL));
+  list = list_append(list, mk_instr(nuGOTO,while_label,NULL,NULL));
 
   if(exit_addr)
-    list = list_append(list, mk_instr(iLABEL, exit_addr, NULL, NULL));
+    list = list_append(list, mk_instr(nuLABEL, exit_addr, NULL, NULL));
 
   return list;
 }
@@ -235,31 +235,31 @@ instr_kind get_binop_instr(Binop op)
   switch(op)
   {
   case OP_AND:
-    return iAND;  break;
+    return nuAND;  break;
   case OP_OR:
-    return iOR;   break;
+    return nuOR;   break;
   case OP_EQ:
-    return iEQ;   break;
+    return nuEQ;   break;
   case OP_DIFF:
-    return iDIFF; break;
+    return nuDIFF; break;
   case OP_LT:
-    return iLT;   break;
+    return nuLT;   break;
   case OP_GT:
-    return iGT;   break;
+    return nuGT;   break;
   case OP_LTE:
-    return iLTE;  break;
+    return nuLTE;  break;
   case OP_GTE:
-    return iGTE;  break;
+    return nuGTE;  break;
   case OP_SUM:
-    return iADD;  break;
+    return nuADD;  break;
   case OP_SUB:
-    return iSUB;  break;
+    return nuSUB;  break;
   case OP_MULT:
-    return iMULT; break;
+    return nuMULT; break;
   case OP_DIV:
-    return iDIV;  break;
+    return nuDIV;  break;
   default:
-    return iMOD;
+    return nuMOD;
   }
 }
 
@@ -316,51 +316,51 @@ void printIC(InstrList* ic)
   {
     switch(ic->instr->kind)
     {
-    case iADD:
-      print_operation(ic->instr,"+");                   break;
-    case iSUB:
-      print_operation(ic->instr,"-");                   break;
-    case iMULT:
-      print_operation(ic->instr,"*");                   break;
-    case iDIV:
-      print_operation(ic->instr,"/");                   break;
-    case iMOD:
-      print_operation(ic->instr,"%");                   break;
-    case iAND:
-      print_operation(ic->instr,"&&");                  break;
-    case iOR:
-      print_operation(ic->instr,"||");                  break;
-    case iLT:
-      print_operation(ic->instr,"<");                   break;
-    case iLTE:
-      print_operation(ic->instr,"<=");                  break;
-    case iGT:
-      print_operation(ic->instr,">");                   break;
-    case iGTE:
-      print_operation(ic->instr,">=");                  break;
-    case iEQ:
-      print_operation(ic->instr,"==");                  break;
-    case iDIFF:
-      print_operation(ic->instr,"!=");                  break;
-    case iRD:
+    case nuREAD:
       printf("READ %s\n", ic->instr->addr1->core.reg);  break;
-    case iWR:
+    case nuWRITE:
       printf("WRITE %s\n", ic->instr->addr1->core.reg); break;
-    case iCOPY:
+    case nuADD:
+      print_operation(ic->instr,"+");                   break;
+    case nuSUB:
+      print_operation(ic->instr,"-");                   break;
+    case nuMULT:
+      print_operation(ic->instr,"*");                   break;
+    case nuDIV:
+      print_operation(ic->instr,"/");                   break;
+    case nuMOD:
+      print_operation(ic->instr,"%");                   break;
+    case nuAND:
+      print_operation(ic->instr,"&&");                  break;
+    case nuOR:
+      print_operation(ic->instr,"||");                  break;
+    case nuLT:
+      print_operation(ic->instr,"<");                   break;
+    case nuLTE:
+      print_operation(ic->instr,"<=");                  break;
+    case nuGT:
+      print_operation(ic->instr,">");                   break;
+    case nuGTE:
+      print_operation(ic->instr,">=");                  break;
+    case nuEQ:
+      print_operation(ic->instr,"==");                  break;
+    case nuDIFF:
+      print_operation(ic->instr,"!=");                  break;
+    case nuCOPY:
       printf("COPY %s ", ic->instr->addr1->core.reg);
       print_address(ic->instr->addr2,1);
       break;
-    case iIF_F:
+    case nuIF_F:
       printf("IF_FALSE %s GOTO %s\n", ic->instr->addr1->core.reg, ic->instr->addr2->core.reg);
       break;
-    case iLABEL:
+    case nuLABEL:
       printf("LABEL %s\n", ic->instr->addr1->core.reg);
       break;
-    case iGOTO:
+    case nuGOTO:
       printf("GOTO %s\n", ic->instr->addr1->core.reg);
       break;
     default:
-      printf("Other stuff I cant deal with right now...\n");
+      printf("ERROR\n");
     }
     ic = ic->next;
   }
