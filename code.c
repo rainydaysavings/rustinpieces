@@ -50,7 +50,6 @@ InstrList* compile_attrib(Attrib* attrib)
 
   if(!p->second)
   {
-    // COPY instruction
     if(!r)
     {
       r = reg_alloc();

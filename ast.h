@@ -8,7 +8,7 @@ typedef int primitive;
 typedef int token;
 
 
-// Rules
+
 struct _StmtList
 {
   struct _Stmt* stmt;
@@ -107,16 +107,16 @@ struct _Print
 
 struct _While
 {
-  struct _Expr* cond;      // can be NULL
-  struct _StmtList* block; // can be NULL
+  struct _Expr* cond;
+  struct _StmtList* block;
 };
 
 struct _If
 {
-  struct _Attrib* attrib;      // can be NULL
+  struct _Attrib* attrib;
   struct _Expr* cond;
   struct _StmtList* block;
-  struct _StmtList* elseBlock; // can be NULL
+  struct _StmtList* elseBlock;
 };
 
 
@@ -130,7 +130,7 @@ typedef struct _While While;
 typedef struct _If If;
 
 
-// Rule constructors
+
 StmtList* ast_stmtList(Stmt* stmt, StmtList* next);
 Stmt* ast_stmt_attrib(Attrib* attrib);
 Stmt* ast_stmt_expr(Expr* expr);
@@ -152,7 +152,8 @@ Read* ast_print_output(var str, var input);
 While* ast_while(Expr* cond, StmtList* block);
 If* ast_if(Attrib* attrib, Expr* cond, StmtList* block, StmtList* elseBlock);
 
-// Printing the ASTs
+
+
 void printAST(StmtList* root, int depth);
 void printStmtList(StmtList* stmtList, int depth);
 void printStmt(Stmt* stmt, int depth);

@@ -20,7 +20,7 @@
   #include "mips.h"
 
   StmtList* root;
-  InstrList* ic3;
+  InstrList* instructions;
   List* symList;
 
   int validate_expression(Expr* expr, int type);
@@ -104,7 +104,7 @@ Program:
 | Main
 {
   root = $1;
-  ic3 = genIC(root);
+  instructions = genIC(root);
   compiler();
 }
 ;
@@ -145,6 +145,12 @@ AttribStmt                                                      { $$ = ast_stmt_
 
 InputStmt:
 CMD_PRINT SYM_OP VARP SYM_CP                                    { $$ = ast_print_input_word($3); }
+| CMD_PRINT VAR                                                 {
+                                                                  if(list_get(symList,$2) == -1)
+                                                                    yyerror("variable not declared!");
+
+                                                                  $$ = ast_print_input_word($2);
+                                                                }
 ;
 
 
@@ -368,12 +374,12 @@ int validate_var(string var, int type)
 
 void compiler()
 {
-  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nAST:\n\n");
+  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nAST:\n\n");
   printAST(root,0);
-  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nIC:\n\n");
-  printIC(ic3);
-  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nMIPS:\n\n");
-  printMIPS(ic3);
+  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nIC:\n\n");
+  printIC(instructions);
+  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nMIPS:\n\n");
+  printMIPS(instructions);
 
 }
 

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "parser.tab.h"
 #include "ast.h"
-// Go from a statement to the next
+
 StmtList* ast_stmtList(Stmt* stmt, StmtList* next)
 {
   StmtList* s = (StmtList*)malloc(sizeof(StmtList));
@@ -13,7 +13,7 @@ StmtList* ast_stmtList(Stmt* stmt, StmtList* next)
   return s;
 }
 
-// Statements
+
 Stmt* ast_stmt_attrib(Attrib* attrib)
 {
   Stmt* s = (Stmt*)malloc(sizeof(Stmt));
@@ -68,7 +68,7 @@ Stmt* ast_stmt_if(If* ifCmd)
   return s;
 }
 
-// Attributions
+
 Attrib* ast_attrib_assign(var id, Expr* expr)
 {
   Attrib* a = (Attrib*)malloc(sizeof(Attrib));
@@ -165,7 +165,7 @@ Read* ast_print_output(var str, var input)
   return f;
 }
 
-// While and If
+
 While* ast_while(Expr* cond, StmtList* block)
 {
   While* f = (While*)malloc(sizeof(While));
@@ -184,7 +184,7 @@ If* ast_if(Attrib* attrib, Expr* cond, StmtList* block, StmtList* elseBlock)
   return i;
 }
 
-// Printing the AST
+
 void printAST(StmtList* root, int depth)
 {
   printf("main\n");
@@ -199,7 +199,6 @@ void printStmtList(StmtList* stmtList, int depth)
   while(p)
   {
     if(p->stmt && !(p->stmt->kind == STMT_ATTRIB && !p->stmt->core.attrib) )
-                  // ^ temporary solution for empty ;;;;; lines
     {
       empty = 0;
       printStmt(p->stmt,depth);

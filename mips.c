@@ -6,10 +6,10 @@
 RegList* addr_list;
 int next_reg = 0, next_temp = 0;
 
-void printMIPS(InstrList* ic3)
+void printMIPS(InstrList* instructions)
 {
   write_data();
-  write_text(ic3);
+  write_text(instructions);
 }
 
 void write_data()
@@ -25,13 +25,13 @@ void write_data()
   }
 }
 
-void write_text(InstrList* ic3)
+void write_text(InstrList* instructions)
 {
   printf(".text\n");
 
   write_loads();
 
-  InstrList* p = ic3;
+  InstrList* p = instructions;
   while(p)
   {
     int iff = p->next && p->next->instr->kind == iIF_F;
