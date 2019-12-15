@@ -368,8 +368,13 @@ int validate_var(string var, int type)
 
 void compiler()
 {
+  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nAST:\n\n");
   printAST(root,0);
+  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nIC:\n\n");
+  printIC(ic3);
+  printf("\n˙˘˘˘˘˘˘˘˘˘˘˘˘˘˘˚˚˚˘˘˘˘˘˘˘˘˘˘˘˘˘˙\nMIPS:\n\n");
   printMIPS(ic3);
+
 }
 
 
